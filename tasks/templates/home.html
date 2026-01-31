@@ -1,109 +1,132 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
-{% block title %}Inicio - {{ perfil.nombres }}{% endblock %}
+{% block title %}Inicio - {{ perfil.nombres|default:"CV" }}{% endblock %}
 
 {% block content %}
 <div class="container py-4">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold" style="color: var(--rosa-fuerte);">
+            {% if perfil %}
+                {{ perfil.nombres }} {{ perfil.apellidos }}
+            {% else %}
+                Mi Portafolio Profesional
+            {% endif %}
+        </h1>
+        <p class="lead text-muted">Desarrollador Web | Estudiante de TI</p>
+    </div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-4">
-
-            <div class="text-center mb-4">
-                <h2 class="fw-bold" style="color: var(--rosa-fuerte);">
-                    Información Personal
-                </h2>
-                <p class="text-muted mb-0">
-                    Detalle completo del perfil profesional
-                </p>
-                <hr class="mx-auto mt-3" style="width: 80px; height: 3px; background-color: var(--rosa-fuerte);">
-            </div>
-
-            <div class="alert alert-light border mb-4"
-                 style="border-left: 5px solid var(--rosa-boton) !important;">
-                <h5 class="alert-heading text-dark">Sobre mí</h5>
-                <p class="mb-0">
-                    {{ perfil.descripcionperfil|default:"Sin descripción disponible." }}
-                </p>
-            </div>
-
-            <div class="row g-4">
-                <!-- Identificación -->
-                <div class="col-md-6">
-                    <h5 class="mb-3 text-secondary">🪪 Identificación</h5>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">
-                            <strong>Cédula:</strong> {{ perfil.numerocedula }}
-                        </li>
-                        <li class="list-group-item">
-                            <strong>Nacionalidad:</strong> {{ perfil.nacionalidad }}
-                        </li>
-                        <li class="list-group-item">
-                            <strong>Lugar de Nacimiento:</strong>
-                            {{ perfil.lugarnacimiento|default:"No registrado" }}
-                        </li>
-                        <li class="list-group-item">
-                            <strong>Fecha de Nacimiento:</strong>
-                            {{ perfil.fechanacimiento|date:"d \\d\\e F \\d\\e Y" }}
-                        </li>
-                        <li class="list-group-item">
-                            <strong>Sexo:</strong> {{ perfil.get_sexo_display }}
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Contacto -->
-                <div class="col-md-6">
-                    <h5 class="mb-3 text-secondary">📞 Contacto</h5>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">
-                            <strong>Estado Civil:</strong> {{ perfil.estadocivil }}
-                        </li>
-                        <li class="list-group-item">
-                            <strong>Licencia:</strong>
-                            {{ perfil.licenciaconducir|default:"Ninguna" }}
-                        </li>
-                        <li class="list-group-item">
-                            <strong>Teléfonos:</strong>
-                            {{ perfil.telefonoconvencional }} / {{ perfil.telefonofijo }}
-                        </li>
-                        <li class="list-group-item">
-                            <strong>Sitio Web:</strong>
-                            {% if perfil.sitioweb %}
-                                <a href="{{ perfil.sitioweb }}" target="_blank"
-                                   style="color: var(--rosa-fuerte); text-decoration: none;">
-                                    Visitar sitio
-                                </a>
+    {% if perfil %}
+        <!-- Profile Info -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h3 class="card-title mb-3">👤 Información Personal</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Email:</strong> {{ perfil.email_contacto|default:"No disponible" }}</p>
+                        <p><strong>Teléfono:</strong> {{ perfil.telefonoconvencional|default:"No disponible" }}</p>
+                        <p><strong>Nacionalidad:</strong> {{ perfil.nacionalidad|default:"No disponible" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Cédula:</strong> {{ perfil.numerocedula|default:"No disponible" }}</p>
+                        <p><strong>Fecha Nacimiento:</strong> 
+                            {% if perfil.fechanacimiento %}
+                                {{ perfil.fechanacimiento|date:"d/m/Y" }}
                             {% else %}
                                 No disponible
                             {% endif %}
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <hr class="my-4">
-
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <div class="p-3 bg-light rounded h-100">
-                        <strong>🏠 Dirección Domiciliaria</strong><br>
-                        <span class="text-muted">
-                            {{ perfil.direcciondomiciliaria|default:"No registrada" }}
-                        </span>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="p-3 bg-light rounded h-100">
-                        <strong>🏢 Dirección de Trabajo</strong><br>
-                        <span class="text-muted">
-                            {{ perfil.direcciontrabajo|default:"No registrada" }}
-                        </span>
+                        </p>
+                        <p><strong>Sitio Web:</strong> 
+                            {% if perfil.sitioweb %}
+                                <a href="{{ perfil.sitioweb }}" target="_blank">{{ perfil.sitioweb }}</a>
+                            {% else %}
+                                No disponible
+                            {% endif %}
+                        </p>
                     </div>
                 </div>
             </div>
+        </div>
 
+        <!-- Profile Description -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h3 class="card-title mb-3">📝 Sobre Mí</h3>
+                <p class="card-text">
+                    {{ perfil.descripcionperfil|default:"Estudiante de Tecnología de la Información apasionado por el desarrollo web y la programación."|linebreaks }}
+                </p>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="row mb-4">
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <h2 class="text-primary">{{ resumen_exp|length }}</h2>
+                        <p class="card-text">Experiencias</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <h2 class="text-success">{{ resumen_cursos|length }}</h2>
+                        <p class="card-text">Cursos</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <h2 class="text-warning">{{ resumen_rec|length }}</h2>
+                        <p class="card-text">Reconocimientos</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <h2 class="text-info">{{ resumen_garage|length }}</h2>
+                        <p class="card-text">Productos en Garage</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+        <!-- No Profile Message -->
+        <div class="alert alert-warning text-center">
+            <h4>⚠️ No hay perfil activo</h4>
+            <p>Por favor, crea un perfil en el panel de administración y márcalo como activo.</p>
+            <a href="/admin/tasks/datospersonales/add/" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i> Crear Perfil
+            </a>
+        </div>
+    {% endif %}
+
+    <!-- Quick Links -->
+    <div class="text-center mt-5">
+        <h3 class="mb-4">🌐 Acceso Rápido</h3>
+        <div class="row">
+            <div class="col-md-2 col-sm-4 mb-3">
+                <a href="/experiencia/" class="btn btn-outline-primary w-100">Experiencia</a>
+            </div>
+            <div class="col-md-2 col-sm-4 mb-3">
+                <a href="/cursos/" class="btn btn-outline-success w-100">Cursos</a>
+            </div>
+            <div class="col-md-2 col-sm-4 mb-3">
+                <a href="/reconocimientos/" class="btn btn-outline-warning w-100">Reconocimientos</a>
+            </div>
+            <div class="col-md-2 col-sm-4 mb-3">
+                <a href="/productos-laborales/" class="btn btn-outline-info w-100">Prod. Laborales</a>
+            </div>
+            <div class="col-md-2 col-sm-4 mb-3">
+                <a href="/productos-academicos/" class="btn btn-outline-secondary w-100">Prod. Académicos</a>
+            </div>
+            <div class="col-md-2 col-sm-4 mb-3">
+                <a href="/garage/" class="btn btn-outline-dark w-100">Garage</a>
+            </div>
         </div>
     </div>
-
 </div>
 {% endblock %}

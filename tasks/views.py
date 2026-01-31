@@ -128,3 +128,12 @@ def exportar_cv(request):
         
     except Exception as e:
         return HttpResponse(f'Error: {str(e)}', status=500)
+        # Agrega estas funciones AL FINAL de views.py
+
+def health_check(request):
+    """Vista de verificación de salud"""
+    return render(request, 'health.html')
+
+def error_page(request):
+    """Vista de error genérico"""
+    return render(request, 'error.html')

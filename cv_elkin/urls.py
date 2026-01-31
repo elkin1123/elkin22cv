@@ -21,10 +21,11 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # Agrega aquí tus otras URLs
+    # Asegúrate de incluir las URLs de tu app principal
+    path('', include('tasks.urls')),  # O el nombre de tu app
 ]
 
-# Servir archivos estáticos en desarrollo
+# Solo en desarrollo
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,21 +1,15 @@
 #!/usr/bin/env bash
-# build.sh - Script para construir la aplicación en Render
+# Exit on error
+set -o errexit
 
-echo "=== INICIANDO BUILD ==="
+# Upgrade pip
+pip install --upgrade pip
 
-# Actualizar pip
-python -m pip install --upgrade pip
-
-# Instalar dependencias
-echo "Instalando dependencias..."
+# Install dependencies
 pip install -r requirements.txt
 
-# Aplicar migraciones de base de datos
-echo "Aplicando migraciones..."
-python manage.py migrate --noinput
+# Collect static files
+python manage.py collectstatic --no-input
 
-# Colectar archivos estáticos
-echo "Colectando archivos estáticos..."
-python manage.py collectstatic --noinput --clear
-
-echo "=== BUILD COMPLETADO ==="
+# Apply database migrations
+python manage.py migrate
