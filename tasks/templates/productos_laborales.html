@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Productos Laborales - {{ perfil.nombres|default:"CV" }}{% endblock %}
+
+{% block content %}
+<style>
+    .producto-card {
+        transition: all 0.3s ease;
+        border: none;
+        border-top: 4px solid #3498db;
+        border-radius: 12px;
+        overflow: hidden;
+        height: 100%;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    }
+    .producto-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(52, 152, 219, 0.2);
+        border-top-color: #2980b9;
+    }
+    .producto-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+    }
+    .producto-badge {
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+</style>
+
+<main class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold display-5" style="color: #3498db;">
+            <i class="bi bi-rocket-takeoff-fill me-2"></i>
+            Productos Laborales
+        </h1>
+        <p class="lead text-muted">
+            Proyectos y productos desarrollados aplicando conocimientos técnicos y profesionales.
+        </p>
+        <hr class="mx-auto" style="width: 100px; height: 3px; background: linear-gradient(to right, #3498db, #2ecc71); border: none;">
+    </div>
+
+    {% if productos_laborales %}
+        <div class="row g-4">
+            {% for producto in productos_laborales %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card producto-card shadow-sm">
+                    <div class="card-body d-flex flex-column p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="producto-icon">
+                                <i class="bi bi-briefcase-fill"></i>
+                            </div>
+                            <div class="ms-3">
+                                <h5 class="fw-bold mb-1" style="color: #2c3e50;">
+                                    {{ producto.nombreproducto }}
+                                </h5>
+                                <span class="producto-badge">
+                                    {{ producto.fechaproducto|date:"M Y"|default:"Fecha no especificada" }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <p class="text-muted flex-grow-1">
+                            {{ producto.descripcion|default:"Sin descripción disponible."|truncatechars:150 }}
+                        </p>
+                        
+                        {% if producto.urlproducto %}
+                        <div class="mt-3">
+                            <a href="{{ producto.urlproducto }}" 
+                               target="_blank" 
+                               class="btn btn-sm btn-outline-primary w-100">
+                                <i class="bi bi-link-45deg me-1"></i> Ver Proyecto
+                            </a>
+                        </div>
+                        {% endif %}
+                        
+                        {% if producto.archivoproducto %}
+                        <div class="mt-2">
+                            <a href="{{ producto.archivoproducto.url }}" 
+                               target="_blank" 
+                               class="btn btn-sm btn-outline-success w-100">
+                                <i class="bi bi-download me-1"></i> Descargar
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #f8f9fa, #e9ecef);">
+                <div class="card-body py-5">
+                    <i class="bi bi-inbox display-1" style="color: #95a5a6;"></i>
+                    <h4 class="mt-3" style="color: #7f8c8d;">No hay productos laborales</h4>
+                    <p class="text-muted">Aún no se han registrado productos laborales.</p>
+                    {% if user.is_authenticated %}
+                    <a href="/admin/tasks/productolaboral/add/" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-1"></i> Agregar Producto
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="text-center mt-5">
+        <a href="/" class="btn btn-outline-dark px-4">
+            <i class="bi bi-arrow-left me-1"></i> Volver al Inicio
+        </a>
+    </div>
+</main>
+{% endblock %}

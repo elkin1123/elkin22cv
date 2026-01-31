@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Curriculum Vitae</title>
+    <style type="text/css">
+        body {
+            font-family: "Helvetica", "Arial", sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            margin: 0;
+            padding: 15px;
+            color: #000;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }
+        
+        h1 {
+            font-size: 18px;
+            margin: 5px 0;
+        }
+        
+        h2 {
+            font-size: 14px;
+            background-color: #f0f0f0;
+            padding: 5px;
+            margin: 15px 0 10px 0;
+        }
+        
+        .section {
+            margin-bottom: 15px;
+        }
+        
+        .item {
+            margin-bottom: 8px;
+        }
+        
+        .bold {
+            font-weight: bold;
+        }
+        
+        .date {
+            color: #666;
+            font-size: 11px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        
+        td, th {
+            border: 1px solid #ddd;
+            padding: 5px;
+            vertical-align: top;
+        }
+        
+        ul, ol {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- ENCABEZADO -->
+    <div class="header">
+        <h1>{{ perfil.nombres }} {{ perfil.apellidos }}</h1>
+        <p>{{ perfil.descripcionperfil }}</p>
+        <p>
+            {% if perfil.telefonoconvencional %}Tel: {{ perfil.telefonoconvencional }} | {% endif %}
+            {% if perfil.direcciondomiciliaria %}Dirección: {{ perfil.direcciondomiciliaria }} | {% endif %}
+            {{ perfil.nacionalidad }}
+        </p>
+    </div>
+    
+    <!-- EXPERIENCIA LABORAL -->
+    {% if experiencias %}
+    <div class="section">
+        <h2>EXPERIENCIA LABORAL</h2>
+        {% for exp in experiencias %}
+        <div class="item">
+            <div class="bold">{{ exp.cargodesempenado }}</div>
+            <div>{{ exp.nombrempresa }} - {{ exp.lugarempresa|default:"" }}</div>
+            <div class="date">
+                {{ exp.fechainiciogestion|date:"M Y" }} - 
+                {% if exp.fechafingestion %}
+                    {{ exp.fechafingestion|date:"M Y" }}
+                {% else %}
+                    Actualidad
+                {% endif %}
+            </div>
+            <div>{{ exp.descripcionfunciones }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- CURSOS -->
+    {% if cursos %}
+    <div class="section">
+        <h2>CURSOS Y CAPACITACIONES</h2>
+        {% for curso in cursos %}
+        <div class="item">
+            <div class="bold">{{ curso.nombrecurso }}</div>
+            <div>{{ curso.entidadpatrocinadora|default:"" }}</div>
+            <div class="date">
+                {{ curso.fechainicio|date:"M Y" }} - {{ curso.fechafin|date:"M Y" }}
+                ({{ curso.totalhoras }} horas)
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- RECONOCIMIENTOS -->
+    {% if reconocimientos %}
+    <div class="section">
+        <h2>RECONOCIMIENTOS</h2>
+        {% for rec in reconocimientos %}
+        <div class="item">
+            <div class="bold">{{ rec.tiporeconocimiento }}</div>
+            <div>{{ rec.entidadpatrocinadora|default:"" }}</div>
+            <div class="date">{{ rec.fechareconocimiento|date:"M Y" }}</div>
+            <div>{{ rec.descripcionreconocimiento }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- PRODUCTOS ACADÉMICOS -->
+    {% if productos_academicos %}
+    <div class="section">
+        <h2>PRODUCTOS ACADÉMICOS</h2>
+        <ul>
+            {% for prod in productos_academicos %}
+            <li>{{ prod.nombrerecurso }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    
+    <!-- PRODUCTOS LABORALES -->
+    {% if productos_laborales %}
+    <div class="section">
+        <h2>PRODUCTOS LABORALES</h2>
+        <ul>
+            {% for prod in productos_laborales %}
+            <li>{{ prod.nombreproducto }} ({{ prod.fechaproducto|date:"Y" }})</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    
+    <!-- PIE DE PÁGINA -->
+    <div style="margin-top: 30px; padding-top: 10px; border-top: 1px solid #ccc; font-size: 10px; text-align: center;">
+        Generado el {% now "d/m/Y H:i" %}
+    </div>
+</body>
+</html>

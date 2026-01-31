@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial; padding: 50px; text-align: center; }
+        .error-box { 
+            background: #fff3f3; 
+            border: 2px solid #ff6b6b; 
+            padding: 30px; 
+            border-radius: 10px; 
+            max-width: 600px; 
+            margin: 0 auto; 
+        }
+        .btn { 
+            background: #3498db; 
+            color: white; 
+            padding: 10px 20px; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            display: inline-block; 
+            margin-top: 20px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="error-box">
+        <h1 style="color: #e74c3c;">⚠️ Error al generar PDF</h1>
+        <p>{{ message|default:"Ocurrió un error al generar el PDF." }}</p>
+        <p>Por favor:</p>
+        <ol style="text-align: left; display: inline-block;">
+            <li>Ve al <a href="/admin/">panel de administración</a></li>
+            <li>Crea un perfil y márcalo como "activo"</li>
+            <li>Añade algunos datos (experiencias, cursos, etc.)</li>
+            <li>Intenta generar el PDF nuevamente</li>
+        </ol>
+        <br><br>
+        <a href="/" class="btn">🏠 Volver al inicio</a>
+        <a href="/admin/" class="btn">⚙️ Ir al Admin</a>
+    </div>
+</body>
+</html>
