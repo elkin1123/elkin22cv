@@ -14,7 +14,8 @@ from pathlib import Path
 import os 
 import dj_database_url
 
-
+# Configuración para psycopg3
+os.environ.setdefault('DJANGO_DB_ENGINE', 'django.db.backends.postgresql')
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -27,7 +28,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'your-secret-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.onrender.com'
+]
+
+
 
 
 ALLOWED_HOSTS = ['*']
@@ -83,15 +96,14 @@ WSGI_APPLICATION = 'cv_elkin.wsgi.application'
 
 # Reemplace la configuración de SQLite DATABASES con PostgreSQL:
 
+# En settings.py, alrededor de donde está DATABASES
+BASE_DIR = Path(__file__).resolve().parent.parent
 DATABASES = {
-    'default': dj_database_url.config(
-        default='sqlite:///db.sqlite3',
+    "default": dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
         conn_max_age=600,
-        ssl_require=False
     )
 }
-
-
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
@@ -128,13 +140,23 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# Carpeta static para desarrollo
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
+# Carpeta donde Django recopila los estáticos
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# WhiteNoise solo en producción
 if not DEBUG:
+    STATICFILES_STORAGE = (
+        'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    )
+# =========================
+# AUTH
+# =========================
 
-    STATIC_ROOT =os.path.join(BASE_DIR, 'staticfiles')
-
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-LOGIN_URL = "/signin"
-
+LOGIN_URL = '/signin'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
