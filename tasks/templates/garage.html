@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Garage - {{ perfil.nombres }}{% endblock %}
+
+{% block content %}
+<main class="container py-4">
+
+    <div class="text-center mb-5">
+        <h1 class="fw-bold" style="color: var(--rosa-fuerte);">
+            🛒 Venta de Garage
+        </h1>
+        <p class="text-muted">
+            Artículos en excelente estado, disponibles por tiempo limitado.
+        </p>
+        <hr class="mx-auto" style="width: 90px; height: 3px; background-color: var(--rosa-fuerte);">
+    </div>
+
+    <div class="row g-4">
+        {% for item in garage_items %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-0 card-hover">
+
+                <!-- Imagen -->
+                <div style="height: 210px; overflow: hidden; background: #f8f9fa;">
+                    {% if item.foto %}
+                        <img src="{{ item.foto.url }}"
+                             alt="{{ item.nombreproducto }}"
+                             class="w-100 h-100"
+                             style="object-fit: cover;">
+                    {% else %}
+                        <div class="d-flex justify-content-center align-items-center h-100 fs-1">
+                            📦
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Contenido -->
+                <div class="card-body d-flex flex-column">
+                    <h5 class="fw-semibold text-dark mb-1">
+                        {{ item.nombreproducto }}
+                    </h5>
+
+                    <span class="badge rounded-pill bg-info text-dark align-self-start mb-2">
+                        {{ item.estadoproducto }}
+                    </span>
+
+                    <h4 class="fw-bold mt-2" style="color: var(--rosa-fuerte);">
+                        ${{ item.valordelbien }}
+                    </h4>
+
+                    <p class="text-muted small mt-3">
+                        {{ item.descripcion|default:"Sin descripción disponible." }}
+                    </p>
+                </div>
+
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-warning text-center shadow-sm">
+                No hay artículos disponibles por el momento.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="text-center mt-5">
+        <a href="{% url 'home' %}" class="btn btn-outline-dark">
+            ⬅ Volver al inicio
+        </a>
+    </div>
+
+</main>
+{% endblock %}
