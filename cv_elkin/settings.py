@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import dj_database_url
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -13,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY / DEBUG
 # =========================
 SECRET_KEY = os.environ.get('SECRET_KEY', 'iy-z-0qT3MHUL4p5Y-0_213HMJL5sBxTe8dL4ergAuvVwVhV0EK0XGFZ68S4FBV_I0s')
-DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'  # True por defecto para desarrollo
 
 # =========================
 # ALLOWED HOSTS (Render)
@@ -24,7 +25,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-    ALLOWED_HOSTS.append('*')  # Temporal para testing
+    # NO agregar '*', Render ya lo maneja
 
 # =========================
 # APPS (CON CLOUDINARY)
@@ -128,10 +129,6 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Solución al error de Cloudinary/Whitenoise
-# Opción 1: Deshabilitar la compresión temporalmente
-# STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
-
-# Opción 2: Usar CompressedManifestStaticFilesStorage pero con configuración
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Excluir archivos de Cloudinary de la compresión
@@ -156,25 +153,31 @@ CLOUDINARY_STORAGE = {
 }
 # Solo usar Cloudinary para MEDIA, no para STATIC
 DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # Ya definido arriba
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # =========================
-# SECURITY HEADERS (Render)
+# SECURITY HEADERS (Render) - CORREGIDO
 # =========================
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-CSRF_TRUSTED_ORIGINS = [
-    'https://*.onrender.com',
-    'https://*.render.com',
-]
-
-# Asegurar cookies seguras en producción
-if not DEBUG:
+# Solo activar seguridad HTTPS en producción (Render)
+if RENDER_EXTERNAL_HOSTNAME:  # ← Esto verifica si estás en Render
+    # Configuraciones para producción (Render)
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    SECURE_SSL_REDIRECT = True
+    CSRF_TRUSTED_ORIGINS = [
+        f'https://{RENDER_EXTERNAL_HOSTNAME}',
+        'https://*.onrender.com',
+    ]
+else:
+    # Configuraciones para desarrollo local
+    SECURE_PROXY_SSL_HEADER = None  # ← Importante para desarrollo
+    SECURE_SSL_REDIRECT = False  # ← Deshabilitar redirección HTTPS en local
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    CSRF_TRUSTED_ORIGINS = []
 
 # =========================
 # DEFAULT AUTO FIELD
