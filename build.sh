@@ -1,5 +1,4 @@
 #!/bin/bash
-# build.sh
 set -o errexit
 
 echo "=== Actualizando pip ==="
@@ -22,6 +21,9 @@ python manage.py check --deploy || echo "Check encontró advertencias, continuan
 
 echo "=== Aplicando migraciones ==="
 python manage.py migrate --noinput
+
+echo "=== Creando superusuario si no existe ==="
+python manage.py createsuperuser --noinput || true
 
 echo "=== Recolectando archivos estáticos ==="
 python manage.py collectstatic --noinput --clear
