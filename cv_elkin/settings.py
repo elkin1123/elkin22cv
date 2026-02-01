@@ -28,17 +28,17 @@ if RENDER_EXTERNAL_HOSTNAME:
 # =========================
 # APPS (CON CLOUDINARY)
 # =========================
+I# En INSTALLED_APPS, asegúrate que estén en ESTE ORDEN:
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
-    
-    # Cloudinary (IMPORTANTE: en este orden)
+    # Cloudinary apps (IMPORTANTE: antes de staticfiles)
     'cloudinary_storage',  # PRIMERO
     'cloudinary',          # SEGUNDO
+    'django.contrib.staticfiles',  # TERCERO
     
     # Tu app
     'tasks',

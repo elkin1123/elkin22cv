@@ -1,18 +1,13 @@
 services:
   - type: web
-    name: elkin-cv
+    name: cv-elkin
     env: python
-    buildCommand: "./build.sh"
-    startCommand: "gunicorn ELKIN_CV.wsgi:application"
+    buildCommand: |
+      pip install --upgrade pip
+      pip install Django==4.2.10 gunicorn==21.2.0 whitenoise==6.6.0 dj-database-url==2.1.0 psycopg2-binary==2.9.9 cloudinary==1.38.0 django-cloudinary-storage==0.3.0
+      python manage.py migrate
+      python manage.py collectstatic --noinput
+    startCommand: gunicorn cv_elkin.wsgi:application
     envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: elkindb
-          property: connectionString
-      - key: SECRET_KEY
-        generateValue: true
-      - key: DEBUG
-        value: "False"
-      - key: ALLOWED_HOSTS
-        value: ".onrender.com,localhost,127.0.0.1"
-    healthCheckPath: /
+      - key: PYTHON_VERSION
+        value: 3.10.12
