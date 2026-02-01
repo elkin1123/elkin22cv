@@ -88,24 +88,12 @@ WSGI_APPLICATION = 'cv_elkin.wsgi.application'
 # =========================
 # DATABASE (PostgreSQL en Render)
 # =========================
-DATABASE_URL = os.environ.get("DATABASE_URL")
-
-if DATABASE_URL:
-    DATABASES = {
-        "default": dj_database_url.parse(
-            DATABASE_URL,
-            conn_max_age=600,
-            ssl_require=True,
-        )
-    }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
-
+DATABASES = {
+    'default': dj_database_url.config(
+        default='sqlite:///db.sqlite3',
+        conn_max_age=600
+    )
+}
 # =========================
 # PASSWORD VALIDATION
 # =========================
@@ -127,80 +115,45 @@ USE_TZ = True
 # =========================
 # STATIC FILES (Whitenoise - CORREGIDO)
 # =========================
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# Solución al error de Cloudinary/Whitenoise
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# Excluir archivos de Cloudinary de la compresión
-WHITENOISE_IGNORE_PATTERNS = [
-    r'^cloudinary/',
-    r'^admin/',
-    r'^jquery\.cloudinary\.js$',
-]
-
-# Si tienes archivos estáticos locales
+# CONFIGURACIÓN DE ARCHIVOS ESTÁTICOS
+STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
-] if os.path.exists(BASE_DIR / 'static') else []
-
-# =========================
-# CLOUDINARY CONFIGURATION (CORREGIDO)
-# =========================
+]
+#
+# --- CONFIGURACIÓN DE CLOUDINARY ---
 CLOUDINARY_STORAGE = {
-    "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME", "dsz8kt2o"),
-    "API_KEY": os.environ.get("CLOUDINARY_API_KEY", "517398933355782"),
-    "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET", "-v0--Xx21237HgM0D5b1jvk1GaM"),
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
-# Solo usar Cloudinary para MEDIA, no para STATIC
-DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
-# =========================
-# SECURITY HEADERS (Render) - CORREGIDO
-# =========================
-# Solo activar seguridad HTTPS en producción (Render)
-if RENDER_EXTERNAL_HOSTNAME:  # ← Esto verifica si estás en Render
-    # Configuraciones para producción (Render)
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    CSRF_TRUSTED_ORIGINS = [
-        f'https://{RENDER_EXTERNAL_HOSTNAME}',
-        'https://*.onrender.com',
-    ]
+# Verificamos si las variables existen para activar el almacenamiento en la nube
+if CLOUDINARY_STORAGE['CLOUD_NAME'] and CLOUDINARY_STORAGE['API_KEY'] and CLOUDINARY_STORAGE['API_SECRET']:
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    MEDIA_URL = '/media/'
 else:
-    # Configuraciones para desarrollo local
-    SECURE_PROXY_SSL_HEADER = None  # ← Importante para desarrollo
-    SECURE_SSL_REDIRECT = False  # ← Deshabilitar redirección HTTPS en local
-    SESSION_COOKIE_SECURE = False
-    CSRF_COOKIE_SECURE = False
-    CSRF_TRUSTED_ORIGINS = []
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
 
-# =========================
-# DEFAULT AUTO FIELD
-# =========================
+# Configuración de Storages para Django 4.2+
+STORAGES = {
+    "default": {
+        "BACKEND": DEFAULT_FILE_STORAGE if 'DEFAULT_FILE_STORAGE' in locals() else "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+# Idioma y Hora
+LANGUAGE_CODE = 'es-ec'
+TIME_ZONE = 'America/Guayaquil' 
+USE_I18N = True
+USE_TZ = True
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# =========================
-# LOGGING CONFIGURATION
-# =========================
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-        },
-    },
-}
+# Permite cargar PDFs en iframes
+X_FRAME_OPTIONS = 'SAMEORIGIN'
