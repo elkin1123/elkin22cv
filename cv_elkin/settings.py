@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     
     # Tu app (CORREGIDO)
-    'tasks',  # Solo el nombre de la app, no .apps.PerfilConfig
+    'tasks.apps.PerfilConfig',
+# Solo el nombre de la app, no .apps.PerfilConfig
 ]
 
 # =========================
@@ -129,31 +130,23 @@ else:
 # =========================
 MEDIA_URL = '/media/'
 
-# Configuración de Cloudinary
+## =========================
+# CLOUDINARY CONFIG
+# =========================
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', 'dsz84kt2o'),
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY', '51793893355762'),
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', ''),
 }
 
-# Determinar backend de almacenamiento
-if all([CLOUDINARY_STORAGE['CLOUD_NAME'], 
-         CLOUDINARY_STORAGE['API_KEY'], 
-         CLOUDINARY_STORAGE['API_SECRET']]):
-    # Usar Cloudinary
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    MEDIA_ROOT = None  # Cloudinary no usa MEDIA_ROOT
-    print("✅ Usando Cloudinary para archivos media")
-else:
-    # Usar sistema de archivos local
-    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-    MEDIA_ROOT = BASE_DIR / 'media'
-    print("⚠️ Usando sistema de archivos local para media")
+MEDIA_URL = '/media/'
 
-# Configuración STORAGES para Django 4.2+
+# =========================
+# STORAGES (DJANGO 4.2+)
+# =========================
 STORAGES = {
     "default": {
-        "BACKEND": DEFAULT_FILE_STORAGE,
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
@@ -166,10 +159,9 @@ STORAGES = {
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # =========================
-# SECURITY HEADERS
+# SECURITY HEADERS (RENDER)
 # =========================
 if RENDER_EXTERNAL_HOSTNAME:
-    # Configuración de seguridad para producción
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
@@ -179,7 +171,6 @@ if RENDER_EXTERNAL_HOSTNAME:
         'https://*.onrender.com',
     ]
 else:
-    # Configuración para desarrollo
     SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
@@ -188,35 +179,3 @@ else:
 # X-FRAME OPTIONS
 # =========================
 X_FRAME_OPTIONS = 'SAMEORIGIN'
-
-# =========================
-# AUTO CREATE SUPERUSER
-# =========================
-def create_superuser_on_startup():
-    """Crear superusuario automáticamente al iniciar en Render"""
-    if os.environ.get('RENDER_EXTERNAL_HOSTNAME'):
-        try:
-            # Importar dentro de la función para evitar problemas
-            import django
-            django.setup()
-            
-            from django.contrib.auth import get_user_model
-            User = get_user_model()
-            
-            # Credenciales de las variables de entorno
-            username = os.environ.get('DJANGO_SUPERUSER_USERNAME', 'admin')
-            email = os.environ.get('DJANGO_SUPERUSER_EMAIL', 'admin@example.com')
-            password = os.environ.get('DJANGO_SUPERUSER_PASSWORD', 'admin2211')
-            
-            if username and password:
-                if not User.objects.filter(username=username).exists():
-                    User.objects.create_superuser(username, email, password)
-                    print(f"✅ Superusuario '{username}' creado automáticamente")
-                else:
-                    print(f"ℹ️ El usuario '{username}' ya existe")
-        except Exception as e:
-            print(f"⚠️ Error al crear superusuario: {e}")
-
-# Ejecutar solo si estamos en un entorno WSGI/Gunicorn
-if 'gunicorn' in os.environ.get('SERVER_SOFTWARE', ''):
-    create_superuser_on_startup()
