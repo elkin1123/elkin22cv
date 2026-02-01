@@ -1,13 +1,34 @@
 services:
   - type: web
     name: cv-elkin
-    env: python
+    runtime: python
+    region: oregon  # o la región que prefieras
+    plan: free  # o "starter", "standard", etc.
     buildCommand: |
       pip install --upgrade pip
-      pip install Django==4.2.10 gunicorn==21.2.0 whitenoise==6.6.0 dj-database-url==2.1.0 psycopg2-binary==2.9.9 cloudinary==1.38.0 django-cloudinary-storage==0.3.0
-      python manage.py migrate
+      pip install -r requirements.txt
+      python manage.py migrate --noinput
       python manage.py collectstatic --noinput
-    startCommand: gunicorn cv_elkin.wsgi:application
+    startCommand: gunicorn cv_elkin.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.10.12
+      - key: SECRET_KEY
+        sync: false
+      - key: DEBUG
+        value: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cv-elkin-db  # Ajusta este nombre
+          property: connectionString
+      - key: CLOUDINARY_CLOUD_NAME
+        value: dz84kt2o
+      - key: CLOUDINARY_API_KEY
+        value: 51793893355762
+      - key: CLOUDINARY_API_SECRET
+        value: -v0--Xx21237HgMD05b1jvk1GaM
+      - key: DJANGO_SETTINGS_MODULE
+        value: cv_elkin.settings
+    autoDeploy: true
+    disk:
+      name: data
+      mountPath: /data
+      sizeGB: 1

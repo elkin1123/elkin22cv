@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # =========================
 # SECURITY / DEBUG
 # =========================
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-clave-temporal-cambiar-en-produccion')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'iy-z-0qT3MHUL4p5Y-0_213HMJL5sBxTe8dL4ergAuvVwVhV0EK0XGFZ68S4FBV_I0s')
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 # =========================
@@ -24,6 +24,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+    ALLOWED_HOSTS.append('*')  # Temporal para testing
 
 # =========================
 # APPS (CON CLOUDINARY)
@@ -34,10 +35,11 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    # Cloudinary apps (IMPORTANTE: antes de staticfiles)
-    'cloudinary_storage',  # PRIMERO
-    'cloudinary',          # SEGUNDO
-    'django.contrib.staticfiles',  # TERCERO
+    'django.contrib.staticfiles',
+    
+    # Cloudinary apps (IMPORTANTE: después de staticfiles)
+    'cloudinary',
+    'cloudinary_storage',
     
     # Tu app
     'tasks',
@@ -120,26 +122,41 @@ USE_I18N = True
 USE_TZ = True
 
 # =========================
-# STATIC FILES (Whitenoise)
+# STATIC FILES (Whitenoise - CORREGIDO)
 # =========================
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Solución al error de Cloudinary/Whitenoise
+# Opción 1: Deshabilitar la compresión temporalmente
+# STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
+
+# Opción 2: Usar CompressedManifestStaticFilesStorage pero con configuración
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Si tienes carpeta static, descomenta:
-# STATICFILES_DIRS = [BASE_DIR / 'static']
+# Excluir archivos de Cloudinary de la compresión
+WHITENOISE_IGNORE_PATTERNS = [
+    r'^cloudinary/',
+    r'^admin/',
+    r'^jquery\.cloudinary\.js$',
+]
+
+# Si tienes archivos estáticos locales
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+] if os.path.exists(BASE_DIR / 'static') else []
 
 # =========================
-# MEDIA FILES (Cloudinary)
+# CLOUDINARY CONFIGURATION (CORREGIDO)
 # =========================
-# settings.py - Fragmento actualizado para Cloudinary
 CLOUDINARY_STORAGE = {
-    "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME", "dz84kt2o"),
-    "API_KEY": os.environ.get("CLOUDINARY_API_KEY", "51793893355762"),
-    "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET", "-v0--Xx21237HgMD05b1jvk1GaM"),
+    "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME", "dsz8kt2o"),
+    "API_KEY": os.environ.get("CLOUDINARY_API_KEY", "517398933355782"),
+    "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET", "-v0--Xx21237HgM0D5b1jvk1GaM"),
 }
-
+# Solo usar Cloudinary para MEDIA, no para STATIC
 DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # Ya definido arriba
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -150,9 +167,35 @@ MEDIA_ROOT = BASE_DIR / 'media'
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 CSRF_TRUSTED_ORIGINS = [
     'https://*.onrender.com',
+    'https://*.render.com',
 ]
+
+# Asegurar cookies seguras en producción
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True
 
 # =========================
 # DEFAULT AUTO FIELD
 # =========================
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# =========================
+# LOGGING CONFIGURATION
+# =========================
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+    },
+}
