@@ -28,7 +28,6 @@ if RENDER_EXTERNAL_HOSTNAME:
 # =========================
 # APPS (CON CLOUDINARY)
 # =========================
-I# En INSTALLED_APPS, asegúrate que estén en ESTE ORDEN:
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -66,7 +65,7 @@ ROOT_URLCONF = 'cv_elkin.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # Carpeta global de templates
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -95,7 +94,6 @@ if DATABASE_URL:
         )
     }
 else:
-    # SQLite solo para desarrollo local
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -126,13 +124,13 @@ USE_TZ = True
 # =========================
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [BASE_DIR / 'static']  # Solo si tienes esta carpeta
-
-# WhiteNoise para archivos estáticos comprimidos
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# Si tienes carpeta static, descomenta:
+# STATICFILES_DIRS = [BASE_DIR / 'static']
+
 # =========================
-# MEDIA FILES (Cloudinary - IMPORTANTE)
+# MEDIA FILES (Cloudinary)
 # =========================
 CLOUDINARY_STORAGE = {
     "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME"),
@@ -140,10 +138,8 @@ CLOUDINARY_STORAGE = {
     "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET"),
 }
 
-# Usa Cloudinary para almacenar imágenes
 DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
-# Configuración local de media (solo referencia)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -154,17 +150,6 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 CSRF_TRUSTED_ORIGINS = [
     'https://*.onrender.com',
 ]
-
-# Activar estas opciones solo en producción
-if not DEBUG:
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
 
 # =========================
 # DEFAULT AUTO FIELD
