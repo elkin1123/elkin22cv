@@ -6,9 +6,9 @@ class PerfilConfig(AppConfig):
 
     def ready(self):
         from django.contrib.auth.models import User
-        if not User.objects.filter(username="admin").exists():
+        if not User.objects.filter(username='admin').exists():
             User.objects.create_superuser(
-                username="admin",
-                email="admin@admin.com",
-                password="admin123"
+                'admin',
+                'admin@admin.com',
+                'admin123'
             )
