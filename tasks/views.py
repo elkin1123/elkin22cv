@@ -1,3 +1,4 @@
+# views.py - CORREGIDO
 import base64
 import io
 import requests
@@ -5,7 +6,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa
-from pypdf import PdfWriter
+from PyPDF2 import PdfWriter  # ¡CORREGIDO! De 'pypdf' a 'PyPDF2'
 from .models import (
     DatosPersonales, ExperienciaLaboral, 
     CursoRealizado, Reconocimiento, 
