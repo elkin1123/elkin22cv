@@ -1,34 +1,22 @@
 services:
   - type: web
     name: cv-elkin
-    runtime: python
-    region: oregon  # o la región que prefieras
-    plan: free  # o "starter", "standard", etc.
+    env: python
     buildCommand: |
-      pip install --upgrade pip
       pip install -r requirements.txt
-      python manage.py migrate --noinput
+      python manage.py migrate
       python manage.py collectstatic --noinput
-    startCommand: gunicorn cv_elkin.wsgi:application --bind 0.0.0.0:$PORT
+    startCommand: gunicorn cv_elkin.wsgi:application
     envVars:
-      - key: SECRET_KEY
-        sync: false
-      - key: DEBUG
-        value: false
       - key: DATABASE_URL
         fromDatabase:
-          name: cv-elkin-db  # Ajusta este nombre
+          name: postgresql
           property: connectionString
-      - key: CLOUDINARY_CLOUD_NAME
-        value: dz84kt2o
-      - key: CLOUDINARY_API_KEY
-        value: 51793893355762
-      - key: CLOUDINARY_API_SECRET
-        value: -v0--Xx21237HgMD05b1jvk1GaM
-      - key: DJANGO_SETTINGS_MODULE
-        value: cv_elkin.settings
-    autoDeploy: true
-    disk:
-      name: data
-      mountPath: /data
-      sizeGB: 1
+      - key: DJANGO_SUPERUSER_USERNAME
+        value: admin
+      - key: DJANGO_SUPERUSER_EMAIL
+        value: elkinjoshuadelgadolopez68@gmail.com
+      - key: DJANGO_SUPERUSER_PASSWORD
+        value: Admin123456!
+      - key: DEBUG
+        value: false

@@ -6,6 +6,10 @@ import os
 import sys
 from pathlib import Path
 import dj_database_url
+from dotenv import load_dotenv  # <-- AÑADE ESTO
+
+# Cargar variables de entorno del archivo .env
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,7 +33,7 @@ else:
     ALLOWED_HOSTS.extend(['localhost', '127.0.0.1'])
 
 # =========================
-# APPS (CON CLOUDINARY)
+# APPS (CON CLOUDINARY) - CORREGIDO
 # =========================
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -43,9 +47,8 @@ INSTALLED_APPS = [
     'cloudinary',
     'cloudinary_storage',
     
-    # Tu app (CORREGIDO)
-    'tasks.apps.PerfilConfig',
-# Solo el nombre de la app, no .apps.PerfilConfig
+    # Tu app - CORREGIDO
+    'tasks',  # SOLO 'tasks', NO 'tasks.apps.PerfilConfig'
 ]
 
 # =========================
@@ -86,15 +89,17 @@ TEMPLATES = [
 WSGI_APPLICATION = 'cv_elkin.wsgi.application'
 
 # =========================
-# DATABASE (PostgreSQL en Render)
+# DATABASE (PostgreSQL en Render) - CORREGIDO
 # =========================
-# BASE DE DATOS
+
+# Esta es la configuración que tus compañeros realmente usan
 DATABASES = {
     'default': dj_database_url.config(
-        default='sqlite:///db.sqlite3',
+        default='sqlite:///db.sqlite3',  # Para desarrollo local
         conn_max_age=600
     )
 }
+
 # =========================
 # PASSWORD VALIDATION
 # =========================
@@ -119,39 +124,48 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Directorios adicionales para archivos estáticos
-if os.path.exists(BASE_DIR / 'static'):
-    STATICFILES_DIRS = [BASE_DIR / 'static']
-else:
-    STATICFILES_DIRS = []
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+] if os.path.exists(BASE_DIR / 'static') else []
 
 # =========================
-# MEDIA FILES & CLOUDINARY
+# MEDIA FILES & CLOUDINARY - CORREGIDO
 # =========================
 MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
-## =========================
-# CLOUDINARY CONFIG
-# =========================
+# Configuración de Cloudinary
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', 'dsz84kt2o'),
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY', '51793893355762'),
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', ''),
 }
 
-MEDIA_URL = '/media/'
+# Configuración STORAGES para Django 4.2+ (sin DEFAULT_FILE_STORAGE)
+# Solo usar Cloudinary si tenemos las 3 claves
+if (CLOUDINARY_STORAGE['CLOUD_NAME'] and 
+    CLOUDINARY_STORAGE['API_KEY'] and 
+    CLOUDINARY_STORAGE['API_SECRET']):
+    STORAGES = {
+        "default": {
+            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
+    print("✅ Cloudinary activado para archivos media")
+else:
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
+    print("Cloudinary NO configurado, usando sistema de archivos local")
 
-# =========================
-# STORAGES (DJANGO 4.2+)
-# =========================
-STORAGES = {
-    "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
 
 # =========================
 # DEFAULT AUTO FIELD
@@ -179,3 +193,11 @@ else:
 # X-FRAME OPTIONS
 # =========================
 X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+# =========================
+# AUTO CREATE SUPERUSER - MOVIDO A UN LUGAR MÁS SEGURO
+# =========================
+# Nota: La creación automática de superusuario se ha removido de settings.py
+# para evitar errores durante el inicio. En su lugar, crea un management command
+# o usa un signal (e.g., en apps.py de tu app) para crearlo después de las migraciones.
+# Ejemplo de command: python manage.py createsuperuser --noinput (con variables de entorno)

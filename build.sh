@@ -1,31 +1,36 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -o errexit
 
-echo "=== Actualizando pip ==="
-python -m pip install --upgrade pip
-
-echo "=== Instalando dependencias ==="
+# 1. Instalar dependencias
 pip install -r requirements.txt
 
-echo "=== Creando directorios necesarios ==="
-mkdir -p staticfiles/cloudinary
+# 2. Ejecutar migraciones (CREA LAS TABLAS)
+python manage.py migrate
 
-echo "=== Creando archivo placeholder para Cloudinary JS ==="
-cat > staticfiles/cloudinary/jquery.cloudinary.js << 'EOF'
-// Cloudinary JS placeholder file
-console.log('Cloudinary JS loaded (placeholder)');
+# 3. Crear superusuario automáticamente
+python manage.py shell <<EOF
+import os
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+# Estas son las credenciales por defecto
+username = "admin"
+email = "elkinjoshuadelgadolesp68@gmail.com"
+password = "Admin123456!"
+
+# Intentar obtener de variables de entorno (Render)
+username = os.environ.get("DJANGO_SUPERUSER_USERNAME", username)
+email = os.environ.get("DJANGO_SUPERUSER_EMAIL", email)
+password = os.environ.get("DJANGO_SUPERUSER_PASSWORD", password)
+
+# Crear si no existe
+if not User.objects.filter(username=username).exists():
+    User.objects.create_superuser(username, email, password)
+    print(f"✅ Superusuario '{username}' creado exitosamente")
+else:
+    print(f"ℹ️ El usuario '{username}' ya existe")
 EOF
 
-echo "=== Verificando configuración de Django ==="
-python manage.py check --deploy || echo "Check encontró advertencias, continuando..."
-
-echo "=== Aplicando migraciones ==="
-python manage.py migrate --noinput
-
-echo "=== Creando superusuario si no existe ==="
-python manage.py createsuperuser --noinput || true
-
-echo "=== Recolectando archivos estáticos ==="
-python manage.py collectstatic --noinput --clear
-
-echo "=== Compilación completada exitosamente ==="
+# 4. Archivos estáticos (AL FINAL)
+python manage.py collectstatic --noinput
