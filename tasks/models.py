@@ -112,15 +112,16 @@ class ProductoLaboral(models.Model):
         return self.nombreproducto
 
 
-# --- 7. VENTA GARAGE --- (CORREGIDO - SIN CAMPO DUPLICADO)
+# --- 7. VENTA GARAGE ---
 class VentaGarage(models.Model):
     idperfilconqueestaactivo = models.ForeignKey(DatosPersonales, on_delete=models.CASCADE, related_name='ventas_garage')
     nombreproducto = models.CharField(max_length=100)
     estadoproducto = models.CharField(max_length=40)
     descripcion = models.CharField(max_length=100, blank=True, null=True)
     valordelbien = models.DecimalField(max_digits=5, decimal_places=2)
-    foto = models.ImageField(upload_to='fotos_garage/', blank=True, null=True)
     activarparaqueseveaenfront = models.BooleanField(default=True)
+    
+    foto = models.ImageField(upload_to='fotos_garage/', blank=True, null=True)
 
     def __str__(self):
         return self.nombreproducto
