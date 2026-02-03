@@ -1,0 +1,6 @@
+# requirements_fix.txt
+Django==4.2.10
+reportlab==4.1.0
+Pillow==10.3.0
+chardet==5.2.0
+# Removemos svglib y xhtml2pdf que causan problemas

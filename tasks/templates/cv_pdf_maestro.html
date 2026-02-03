@@ -2,456 +2,177 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Curriculum Vitae - {{ perfil.nombres }} {{ perfil.apellidos }}</title>
+    <title>Curriculum Vitae</title>
     <style>
-        /* Estilos generales */
+        /* ESTILOS MÍNIMOS Y SEGUROS */
         @page {
             size: A4;
             margin: 2cm;
         }
         
         body {
-            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-family: 'Arial', sans-serif;
             font-size: 12px;
-            line-height: 1.5;
+            line-height: 1.4;
             color: #333;
-            margin: 0;
-            padding: 0;
         }
         
-        /* Encabezado con foto */
         .header {
-            display: flex;
-            margin-bottom: 30px;
-            border-bottom: 3px solid #2c3e50;
-            padding-bottom: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 15px;
         }
         
-        .foto-container {
-            flex: 0 0 150px;
-            margin-right: 30px;
-        }
-        
-        .foto {
-            width: 150px;
-            height: 150px;
+        .foto-perfil {
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid #3498db;
+            border: 3px solid #007bff;
         }
         
-        .sin-foto {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            background-color: #ecf0f1;
-            border: 3px dashed #bdc3c7;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #7f8c8d;
-            font-size: 12px;
-            text-align: center;
-            padding: 10px;
-        }
-        
-        .info-principal {
-            flex: 1;
-        }
-        
-        .nombre {
-            font-size: 28px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin: 0 0 10px 0;
-        }
-        
-        .titulo {
-            font-size: 18px;
-            color: #3498db;
-            margin: 0 0 20px 0;
-            font-weight: normal;
-        }
-        
-        .contacto {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .contacto-item {
-            font-size: 11px;
-        }
-        
-        .contacto-label {
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        
-        /* Secciones */
         .section {
-            margin-bottom: 25px;
+            margin-bottom: 15px;
             page-break-inside: avoid;
         }
         
         .section-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: #2c3e50;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 5px;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-        }
-        
-        /* Items dentro de secciones */
-        .item {
-            margin-bottom: 15px;
-            page-break-inside: avoid;
-        }
-        
-        .item-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-        }
-        
-        .item-title {
+            background: #007bff;
+            color: white;
+            padding: 5px 10px;
+            margin-bottom: 10px;
             font-size: 14px;
             font-weight: bold;
-            color: #2c3e50;
-            margin: 0;
         }
         
-        .item-fecha {
-            font-size: 11px;
-            color: #7f8c8d;
-            font-style: italic;
-        }
-        
-        .item-subtitle {
-            font-size: 12px;
-            color: #3498db;
-            margin: 0 0 5px 0;
-        }
-        
-        .item-description {
-            font-size: 11px;
-            color: #555;
-            margin: 5px 0;
-            text-align: justify;
-        }
-        
-        /* Tablas para datos personales */
-        .datos-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 11px;
-        }
-        
-        .datos-table td {
-            padding: 8px 5px;
-            vertical-align: top;
+        .item {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
             border-bottom: 1px solid #eee;
         }
         
-        .datos-label {
-            font-weight: bold;
-            color: #2c3e50;
-            width: 40%;
+        .item:last-child {
+            border-bottom: none;
         }
         
-        /* Garage/Venta */
-        .garage-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .garage-item {
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 10px;
-            page-break-inside: avoid;
-        }
-        
-        .garage-imagen {
-            width: 100%;
+        .no-foto {
+            width: 120px;
             height: 120px;
-            object-fit: cover;
-            border-radius: 3px;
-            margin-bottom: 10px;
-        }
-        
-        .garage-sin-imagen {
-            width: 100%;
-            height: 120px;
-            background-color: #f5f5f5;
-            border-radius: 3px;
+            background: #f0f0f0;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #999;
-            font-size: 11px;
-            margin-bottom: 10px;
+            font-size: 12px;
         }
         
-        .garage-precio {
-            font-weight: bold;
-            color: #e74c3c;
-            font-size: 14px;
-            margin-top: 5px;
+        /* Evitar cortes de página dentro de elementos importantes */
+        .keep-together {
+            page-break-inside: avoid;
         }
         
-        /* Utilidades */
-        .page-break {
-            page-break-before: always;
-        }
-        
-        .text-center {
-            text-align: center;
-        }
-        
-        .text-right {
-            text-align: right;
-        }
-        
-        .mb-10 {
-            margin-bottom: 10px;
-        }
-        
-        .mt-20 {
-            margin-top: 20px;
-        }
-        
-        /* Footer */
-        .footer {
-            margin-top: 30px;
-            padding-top: 10px;
-            border-top: 1px solid #ddd;
+        /* Para certificados */
+        .certificado-note {
+            font-style: italic;
+            color: #666;
             font-size: 10px;
-            color: #7f8c8d;
-            text-align: center;
         }
     </style>
 </head>
 <body>
-    <!-- ENCABEZADO CON FOTO -->
     <div class="header">
-        <div class="foto-container">
-            {% if foto_pdf %}
-                <img src="{{ foto_pdf }}" class="foto" alt="Foto de {{ perfil.nombres }}">
-            {% else %}
-                <div class="sin-foto">Sin foto de perfil</div>
-            {% endif %}
-        </div>
+        <h1>{{ perfil.nombres }} {{ perfil.apellidos }}</h1>
+        <p>{{ perfil.profesion }}</p>
         
-        <div class="info-principal">
-            <h1 class="nombre">{{ perfil.nombres }} {{ perfil.apellidos }}</h1>
-            <h2 class="titulo">{{ perfil.descripcionperfil }}</h2>
-            
-            <div class="contacto">
-                <div class="contacto-item">
-                    <span class="contacto-label">Cédula:</span> {{ perfil.numerocedula }}
-                </div>
-                <div class="contacto-item">
-                    <span class="contacto-label">Nacionalidad:</span> {{ perfil.nacionalidad }}
-                </div>
-                <div class="contacto-item">
-                    <span class="contacto-label">Teléfono:</span> {{ perfil.telefonoconvencional|default:"No especificado" }}
-                </div>
-                <div class="contacto-item">
-                    <span class="contacto-label">Sitio web:</span> {{ perfil.sitioweb|default:"No especificado" }}
-                </div>
-            </div>
-        </div>
+        {% if foto_pdf %}
+            <img src="{{ foto_pdf }}" alt="Foto" class="foto-perfil">
+        {% else %}
+            <div class="no-foto">Sin foto</div>
+        {% endif %}
     </div>
     
-    <!-- DATOS PERSONALES -->
     <div class="section">
-        <h2 class="section-title">Datos Personales</h2>
-        <table class="datos-table">
-            <tr>
-                <td class="datos-label">Fecha de nacimiento:</td>
-                <td>{{ perfil.fechanacimiento }}</td>
-                <td class="datos-label">Lugar de nacimiento:</td>
-                <td>{{ perfil.lugarnacimiento|default:"No especificado" }}</td>
-            </tr>
-            <tr>
-                <td class="datos-label">Sexo:</td>
-                <td>{{ perfil.get_sexo_display }}</td>
-                <td class="datos-label">Estado civil:</td>
-                <td>{{ perfil.estadocivil|default:"No especificado" }}</td>
-            </tr>
-            <tr>
-                <td class="datos-label">Dirección domiciliaria:</td>
-                <td>{{ perfil.direcciondomiciliaria|default:"No especificado" }}</td>
-                <td class="datos-label">Dirección de trabajo:</td>
-                <td>{{ perfil.direcciontrabajo|default:"No especificado" }}</td>
-            </tr>
-            <tr>
-                <td class="datos-label">Licencia de conducir:</td>
-                <td>{{ perfil.licenciaconducir|default:"No tiene" }}</td>
-                <td class="datos-label">Teléfono fijo:</td>
-                <td>{{ perfil.telefonofijo|default:"No especificado" }}</td>
-            </tr>
-        </table>
+        <div class="section-title">📋 Información Personal</div>
+        <p><strong>Email:</strong> {{ perfil.correo }}</p>
+        <p><strong>Teléfono:</strong> {{ perfil.telefono }}</p>
+        <p><strong>Dirección:</strong> {{ perfil.direccion }}</p>
+        {% if perfil.perfilprofesional %}
+            <p><strong>Perfil:</strong> {{ perfil.perfilprofesional }}</p>
+        {% endif %}
     </div>
     
-    <!-- EXPERIENCIA LABORAL -->
     {% if items %}
-    <div class="section">
-        <h2 class="section-title">Experiencia Laboral</h2>
-        {% for exp in items %}
-        <div class="item">
-            <div class="item-header">
-                <h3 class="item-title">{{ exp.cargodesempenado }}</h3>
-                <div class="item-fecha">
-                    {{ exp.fechainiciogestion|date:"M Y" }} - 
-                    {% if exp.fechafingestion %}
-                        {{ exp.fechafingestion|date:"M Y" }}
-                    {% else %}
-                        Actual
-                    {% endif %}
-                </div>
+    <div class="section keep-together">
+        <div class="section-title">💼 Experiencia Laboral</div>
+        {% for item in items %}
+            <div class="item">
+                <strong>{{ item.titulopuesto }}</strong><br>
+                {{ item.empresa }} | {{ item.fechainicio }} - {{ item.fechafin }}<br>
+                {{ item.descripcion|default:"" }}
             </div>
-            <h4 class="item-subtitle">{{ exp.nombrempresa }}</h4>
-            {% if exp.lugarempresa %}
-                <p class="item-description"><strong>Ubicación:</strong> {{ exp.lugarempresa }}</p>
-            {% endif %}
-            <p class="item-description">{{ exp.descripcionfunciones }}</p>
-            {% if exp.emailempresa or exp.sitiowebempresa %}
-                <p class="item-description">
-                    {% if exp.emailempresa %}<strong>Email:</strong> {{ exp.emailempresa }}{% endif %}
-                    {% if exp.sitiowebempresa %}<strong>Sitio web:</strong> {{ exp.sitiowebempresa }}{% endif %}
-                </p>
-            {% endif %}
-        </div>
         {% endfor %}
     </div>
     {% endif %}
     
-    <!-- CURSOS REALIZADOS -->
-    {% if cursos %}
-    <div class="section">
-        <h2 class="section-title">Cursos Realizados</h2>
-        {% for curso in cursos %}
-        <div class="item">
-            <div class="item-header">
-                <h3 class="item-title">{{ curso.nombrecurso }}</h3>
-                <div class="item-fecha">
-                    {{ curso.fechainicio|date:"M Y" }} - {{ curso.fechafin|date:"M Y" }}
-                    ({{ curso.totalhoras }} horas)
-                </div>
-            </div>
-            {% if curso.entidadpatrocinadora %}
-                <h4 class="item-subtitle">{{ curso.entidadpatrocinadora }}</h4>
-            {% endif %}
-            {% if curso.descripcioncurso %}
-                <p class="item-description">{{ curso.descripcioncurso }}</p>
-            {% endif %}
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-    
-    <!-- RECONOCIMIENTOS -->
-    {% if reconocimientos %}
-    <div class="section">
-        <h2 class="section-title">Reconocimientos</h2>
-        {% for rec in reconocimientos %}
-        <div class="item">
-            <div class="item-header">
-                <h3 class="item-title">{{ rec.descripcionreconocimiento }}</h3>
-                <div class="item-fecha">{{ rec.fechareconocimiento|date:"M Y" }}</div>
-            </div>
-            <h4 class="item-subtitle">{{ rec.tiporeconocimiento }}</h4>
-            {% if rec.entidadpatrocinadora %}
-                <p class="item-description"><strong>Otorgado por:</strong> {{ rec.entidadpatrocinadora }}</p>
-            {% endif %}
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-    
-    <!-- PRODUCTOS ACADÉMICOS -->
     {% if productos %}
-    <div class="section">
-        <h2 class="section-title">Productos Académicos</h2>
-        {% for prod in productos %}
-        <div class="item">
-            <h3 class="item-title">{{ prod.nombrerecurso }}</h3>
-            {% if prod.clasificador %}
-                <p class="item-description"><strong>Categoría:</strong> {{ prod.clasificador }}</p>
-            {% endif %}
-            {% if prod.descripcion %}
-                <p class="item-description">{{ prod.descripcion }}</p>
-            {% endif %}
-        </div>
+    <div class="section keep-together">
+        <div class="section-title">📚 Productos Académicos</div>
+        {% for producto in productos %}
+            <div class="item">
+                <strong>{{ producto.titulo }}</strong><br>
+                {{ producto.descripcion|default:"" }}
+            </div>
         {% endfor %}
     </div>
     {% endif %}
     
-    <!-- PRODUCTOS LABORALES -->
     {% if productos_laborales %}
-    <div class="section">
-        <h2 class="section-title">Productos Laborales</h2>
-        {% for prod in productos_laborales %}
-        <div class="item">
-            <div class="item-header">
-                <h3 class="item-title">{{ prod.nombreproducto }}</h3>
-                <div class="item-fecha">{{ prod.fechaproducto|date:"M Y" }}</div>
+    <div class="section keep-together">
+        <div class="section-title">🏢 Productos Laborales</div>
+        {% for producto in productos_laborales %}
+            <div class="item">
+                <strong>{{ producto.titulo }}</strong><br>
+                {{ producto.descripcion|default:"" }}
             </div>
-            {% if prod.descripcion %}
-                <p class="item-description">{{ prod.descripcion }}</p>
-            {% endif %}
-        </div>
         {% endfor %}
     </div>
     {% endif %}
     
-    <!-- GARAGE / VENTA -->
-    {% if imagenes_garage %}
-    <div class="page-break"></div>
-    <div class="section">
-        <h2 class="section-title">Productos en Venta (Garage)</h2>
-        <div class="garage-container">
-            {% for item in imagenes_garage %}
-            <div class="garage-item">
-                <img src="{{ item.imagen }}" class="garage-imagen" alt="{{ item.nombre }}">
-                <h4 class="item-title">{{ item.nombre }}</h4>
-                {% if item.descripcion %}
-                    <p class="item-description">{{ item.descripcion }}</p>
+    {% if cursos %}
+    <div class="section keep-together">
+        <div class="section-title">🎓 Cursos Realizados</div>
+        {% for curso in cursos %}
+            <div class="item">
+                <strong>{{ curso.nombrecurso }}</strong><br>
+                {{ curso.institucion }} | {{ curso.fechacursorealizado }}<br>
+                {% if curso.rutacertificado %}
+                    <span class="certificado-note">*Certificado incluido al final del PDF</span>
                 {% endif %}
-                <div class="garage-precio">${{ item.precio }}</div>
             </div>
-            {% endfor %}
-        </div>
-    </div>
-    {% elif garage_items %}
-    <div class="section">
-        <h2 class="section-title">Productos en Venta (Garage)</h2>
-        {% for item in garage_items %}
-        <div class="item">
-            <h3 class="item-title">{{ item.nombreproducto }}</h3>
-            <p class="item-description">
-                <strong>Estado:</strong> {{ item.estadoproducto }} | 
-                <strong>Precio:</strong> ${{ item.valordelbien }}
-            </p>
-            {% if item.descripcion %}
-                <p class="item-description">{{ item.descripcion }}</p>
-            {% endif %}
-        </div>
         {% endfor %}
     </div>
     {% endif %}
     
-    <!-- FOOTER -->
-    <div class="footer">
-        <p>Documento generado automáticamente el {% now "j F Y H:i" %}</p>
-        <p>Portafolio Profesional - {{ perfil.nombres }} {{ perfil.apellidos }}</p>
+    {% if reconocimientos %}
+    <div class="section keep-together">
+        <div class="section-title">🏆 Reconocimientos</div>
+        {% for reconocimiento in reconocimientos %}
+            <div class="item">
+                <strong>{{ reconocimiento.titulo }}</strong><br>
+                {{ reconocimiento.descripcion|default:"" }}<br>
+                {{ reconocimiento.fecha }}
+                {% if reconocimiento.rutacertificado %}
+                    <span class="certificado-note">*Certificado incluido al final del PDF</span>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div style="margin-top: 30px; text-align: center; font-size: 10px; color: #999;">
+        Generado el {% now "d/m/Y H:i" %}
     </div>
 </body>
 </html>
