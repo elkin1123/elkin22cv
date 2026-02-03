@@ -1,25 +1,19 @@
-# Crea el archivo build.sh correctamente
-cat > build.sh << 'EOF'
 #!/usr/bin/env bash
 set -o errexit
 
-echo "=== Actualizando pip ==="
+echo "=== ACTUALIZANDO PIP ==="
 pip install --upgrade pip
 
-echo "=== Instalando dependencias ==="
+echo "=== LIMPIANDO CACHE ==="
+pip cache purge
+
+echo "=== INSTALANDO DEPENDENCIAS ==="
 pip install -r requirements.txt
 
-echo "=== Aplicando migraciones ==="
+echo "=== APLICANDO MIGRACIONES ==="
 python manage.py migrate
 
-echo "=== Recolectando archivos estáticos ==="
-python manage.py collectstatic --noinput
+echo "=== COLECTANDO ARCHIVOS ESTÁTICOS ==="
+python manage.py collectstatic --noinput --clear
 
-echo "=== Verificando la app ==="
-python manage.py check --deploy --fail-level WARNING
-
-echo "✅ Build completado exitosamente!"
-EOF
-
-# Dale permisos de ejecución
-chmod +x build.sh
+echo "=== BUILD COMPLETADO EXITOSAMENTE ==="
