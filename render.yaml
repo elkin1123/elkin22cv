@@ -3,8 +3,8 @@ services:
     name: cv-elkin
     env: python
     plan: free
-    buildCommand: "./build.sh"
-    startCommand: "gunicorn cv_elkin.wsgi:application"
+    buildCommand: ./build.sh
+    startCommand: gunicorn cv_elkin.wsgi:application
     envVars:
       - key: SECRET_KEY
         generateValue: true
@@ -12,23 +12,8 @@ services:
         value: "False"
       - key: WEB_CONCURRENCY
         value: "4"
-      - key: DATABASE_URL
-        fromDatabase:
-          name: cv-elkin-db
-          property: connectionString
-      - key: ADMIN_USERNAME
-        value: "admin"
-      - key: ADMIN_EMAIL
-        value: "admin@example.com"
-      - key: ADMIN_PASSWORD
-        generateValue: true
-      - key: CLOUDINARY_CLOUD_NAME
-        sync: false
-      - key: CLOUDINARY_API_KEY
-        sync: false
-      - key: CLOUDINARY_API_SECRET
-        sync: false
-
-databases:
-  - name: cv-elkin-db
-    plan: free
+      # IMPORTANTE: Quita DATABASE_URL si no creaste la BD
+      # - key: DATABASE_URL
+      #   fromDatabase:
+      #     name: cv-elkin-db
+      #     property: connectionString
