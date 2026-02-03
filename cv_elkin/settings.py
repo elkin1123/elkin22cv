@@ -95,12 +95,11 @@ WSGI_APPLICATION = 'cv_elkin.wsgi.application'
 # =========================
 
 # Esta es la configuración que tus compañeros realmente usan
-# En cv_elkin/settings.py, CAMBIA la configuración de DATABASES a:
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default='sqlite:///db.sqlite3',  # Para desarrollo local
+        conn_max_age=600
+    )
 }
 
 # =========================
