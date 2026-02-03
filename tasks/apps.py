@@ -1,4 +1,4 @@
-"""from django.apps import AppConfig
+from django.apps import AppConfig
 
 class PerfilConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
@@ -12,9 +12,9 @@ class PerfilConfig(AppConfig):
                 'admin@admin.com',
                 'admin123'
             )
-"""
 
 
+"""""
 
 from django.apps import AppConfig
 
@@ -38,3 +38,5 @@ class TasksConfig(AppConfig):
         # except Exception as e:
         #     print(f"Error creando superusuario: {e}")
         pass  # Deja solo esta línea
+   
+""""
