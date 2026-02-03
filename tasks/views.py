@@ -113,6 +113,20 @@ def garage(request):
         'perfil': perfil
     })
 
+# ========== FUNCIONES AUXILIARES PARA PDF ==========
+def generar_html_seccion(titulo, queryset, formato_item):
+    """Genera HTML para una sección del CV."""
+    if not queryset.exists():
+        return ''
+    
+    items_html = ''.join([formato_item(item) for item in queryset])
+    return f'''
+    <div class="section">
+        <h3 class="section-title">{titulo}</h3>
+        {items_html}
+    </div>
+    '''
+
 # ========== GENERAR PDF/HTML ==========
 def exportar_cv(request):
     """Genera CV en formato imprimible usando CAMPOS REALES."""
@@ -168,6 +182,47 @@ def exportar_cv(request):
     
     # Fecha actual
     fecha = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
+    
+    # Función para formatear items
+    def formato_experiencia(exp):
+        return f'''<div class="item">
+            <h4 style="margin: 0; color: #2c3e50;">{exp.cargodesempenado}</h4>
+            <p style="margin: 5px 0; color: #7f8c8d;">
+                <i>{exp.nombrempresa} | {exp.fechainiciogestion} - {exp.fechafingestion}</i>
+            </p>
+            <p>{exp.descripcion or ""}</p>
+        </div>'''
+    
+    def formato_academico(prod):
+        return f'''<div class="item">
+            <h4 style="margin: 0; color: #2c3e50;">{prod.nombrerecurso}</h4>
+            <p><strong>Clasificador:</strong> {prod.clasificador or ""}</p>
+            <p>{prod.descripcion or ""}</p>
+        </div>'''
+    
+    def formato_laboral(prod):
+        return f'''<div class="item">
+            <h4 style="margin: 0; color: #2c3e50;">{prod.nombreproducto}</h4>
+            <p><strong>Fecha:</strong> {prod.fechaproducto}</p>
+            <p>{prod.descripcion or ""}</p>
+        </div>'''
+    
+    def formato_curso(curso):
+        return f'''<div class="item">
+            <h4 style="margin: 0; color: #2c3e50;">{curso.nombrecurso}</h4>
+            <p style="margin: 5px 0; color: #7f8c8d;">
+                <i>{curso.entidadpatrocinadora} | {curso.fechafin} | {curso.totalhoras} horas</i>
+            </p>
+        </div>'''
+    
+    def formato_reconocimiento(rec):
+        return f'''<div class="item">
+            <h4 style="margin: 0; color: #2c3e50;">{rec.descripcionreconocimiento}</h4>
+            <p style="margin: 5px 0; color: #7f8c8d;">
+                <i>{rec.tiporeconocimiento} | {rec.fechareconocimiento}</i>
+            </p>
+            <p>{rec.descripcion or ""}</p>
+        </div>'''
     
     # HTML para imprimir
     html = f"""
@@ -309,19 +364,19 @@ def exportar_cv(request):
             {f'<div class="section"><h3 class="section-title">Perfil Profesional</h3><p>{perfil_profesional}</p></div>' if perfil_profesional else ''}
             
             <!-- EXPERIENCIA LABORAL -->
-            {f'<div class="section"><h3 class="section-title">Experiencia Laboral</h3>{"".join([f"""<div class="item"><h4 style="margin: 0; color: #2c3e50;">{exp.cargodesempenado}</h4><p style="margin: 5px 0; color: #7f8c8d;"><i>{exp.nombrempresa} | {exp.fechainiciogestion} - {exp.fechafingestion}</i></p><p>{exp.descripcion or ""}</p></div>""" for exp in experiencias])}</div>' if experiencias.exists() else ''}
+            {generar_html_seccion('Experiencia Laboral', experiencias, formato_experiencia)}
             
             <!-- PRODUCTOS ACADÉMICOS -->
-            {f'<div class="section"><h3 class="section-title">Productos Académicos</h3>{"".join([f"""<div class="item"><h4 style="margin: 0; color: #2c3e50;">{prod.nombrerecurso}</h4><p><strong>Clasificador:</strong> {prod.clasificador or ""}</p><p>{prod.descripcion or ""}</p></div>""" for prod in academicos])}</div>' if academicos.exists() else ''}
+            {generar_html_seccion('Productos Académicos', academicos, formato_academico)}
             
             <!-- PRODUCTOS LABORALES -->
-            {f'<div class="section"><h3 class="section-title">Productos Laborales</h3>{"".join([f"""<div class="item"><h4 style="margin: 0; color: #2c3e50;">{prod.nombreproducto}</h4><p><strong>Fecha:</strong> {prod.fechaproducto}</p><p>{prod.descripcion or ""}</p></div>""" for prod in laborales])}</div>' if laborales.exists() else ''}
+            {generar_html_seccion('Productos Laborales', laborales, formato_laboral)}
             
             <!-- CURSOS -->
-            {f'<div class="section"><h3 class="section-title">Cursos Realizados</h3>{"".join([f"""<div class="item"><h4 style="margin: 0; color: #2c3e50;">{curso.nombrecurso}</h4><p style="margin: 5px 0; color: #7f8c8d;"><i>{curso.entidadpatrocinadora} | {curso.fechafin} | {curso.totalhoras} horas</i></p></div>""" for curso in cursos_list])}</div>' if cursos_list.exists() else ''}
+            {generar_html_seccion('Cursos Realizados', cursos_list, formato_curso)}
             
             <!-- RECONOCIMIENTOS -->
-            {f'<div class="section"><h3 class="section-title">Reconocimientos</h3>{"".join([f"""<div class="item"><h4 style="margin: 0; color: #2c3e50;">{rec.descripcionreconocimiento}</h4><p style="margin: 5px 0; color: #7f8c8d;"><i>{rec.tiporeconocimiento} | {rec.fechareconocimiento}</i></p><p>{rec.descripcion or ""}</p></div>""" for rec in reconocimientos_list])}</div>' if reconocimientos_list.exists() else ''}
+            {generar_html_seccion('Reconocimientos', reconocimientos_list, formato_reconocimiento)}
             
             <!-- INFORMACIÓN ADICIONAL -->
             <div class="section">
