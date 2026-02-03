@@ -22,22 +22,21 @@
                 <h3 class="card-title mb-3">👤 Información Personal</h3>
                 <div class="row">
                     <div class="col-md-6">
-                        <p><strong>Email:</strong> {{ perfil.email_contacto|default:"No disponible" }}</p>
-                        <p><strong>Teléfono:</strong> {{ perfil.telefonoconvencional|default:"No disponible" }}</p>
-                        <p><strong>Nacionalidad:</strong> {{ perfil.nacionalidad|default:"No disponible" }}</p>
+                        <p><strong>📧 Email:</strong> {{ perfil.email_contacto|default:"No disponible" }}</p>
+                        <p><strong>📞 Teléfono:</strong> {{ perfil.telefonoconvencional|default:"No disponible" }}</p>
+                        <p><strong>🌍 Nacionalidad:</strong> {{ perfil.nacionalidad|default:"No disponible" }}</p>
+                        <p><strong>👫 Estado Civil:</strong> {{ perfil.estadocivil|default:"No disponible" }}</p>
                     </div>
                     <div class="col-md-6">
-                        <p><strong>Cédula:</strong> {{ perfil.numerocedula|default:"No disponible" }}</p>
-                        <p><strong>Fecha Nacimiento:</strong> 
-                            {% if perfil.fechanacimiento %}
-                                {{ perfil.fechanacimiento|date:"d/m/Y" }}
-                            {% else %}
-                                No disponible
-                            {% endif %}
-                        </p>
-                        <p><strong>Sitio Web:</strong> 
+                        <p><strong>🆔 Cédula:</strong> {{ perfil.numerocedula|default:"No disponible" }}</p>
+                        <!-- FECHA NACIMIENTO ELIMINADA -->
+                        <!-- LICENCIA CONDUCIR ELIMINADA -->
+                        <p><strong>📍 Dirección:</strong> {{ perfil.direcciondomiciliaria|default:"No disponible" }}</p>
+                        <p><strong>🌐 Sitio Web:</strong> 
                             {% if perfil.sitioweb %}
-                                <a href="{{ perfil.sitioweb }}" target="_blank">{{ perfil.sitioweb }}</a>
+                                <a href="{{ perfil.sitioweb }}" target="_blank" class="text-decoration-none">
+                                    <i class="bi bi-link-45deg"></i> {{ perfil.sitioweb|truncatechars:30 }}
+                                </a>
                             {% else %}
                                 No disponible
                             {% endif %}
@@ -57,37 +56,84 @@
             </div>
         </div>
 
-        <!-- Quick Stats -->
+        <!-- 📊 Estadísticas Detalladas -->
         <div class="row mb-4">
-            <div class="col-md-3 col-sm-6 mb-3">
-                <div class="card text-center h-100">
+            <!-- Experiencia Laboral -->
+            <div class="col-md-4 col-sm-6 mb-3">
+                <div class="card text-center h-100 border-primary">
                     <div class="card-body">
-                        <h2 class="text-primary">{{ resumen_exp|length }}</h2>
-                        <p class="card-text">Experiencias</p>
+                        <i class="bi bi-briefcase-fill text-primary" style="font-size: 2.5rem;"></i>
+                        <h2 class="text-primary mt-2">{{ total_experiencias }}</h2>
+                        <p class="card-text fw-bold">Experiencias Laborales</p>
+                        {% if experiencias_actuales > 0 %}
+                        <small class="text-muted">{{ experiencias_actuales }} actuales</small>
+                        {% else %}
+                        <small class="text-muted">Total registradas</small>
+                        {% endif %}
                     </div>
                 </div>
             </div>
-            <div class="col-md-3 col-sm-6 mb-3">
-                <div class="card text-center h-100">
+            
+            <!-- Cursos -->
+            <div class="col-md-4 col-sm-6 mb-3">
+                <div class="card text-center h-100 border-success">
                     <div class="card-body">
-                        <h2 class="text-success">{{ resumen_cursos|length }}</h2>
-                        <p class="card-text">Cursos</p>
+                        <i class="bi bi-mortarboard-fill text-success" style="font-size: 2.5rem;"></i>
+                        <h2 class="text-success mt-2">{{ total_cursos }}</h2>
+                        <p class="card-text fw-bold">Cursos Realizados</p>
+                        {% if total_horas_cursos > 0 %}
+                        <small class="text-muted">{{ total_horas_cursos }} horas totales</small>
+                        {% else %}
+                        <small class="text-muted">Total cursos</small>
+                        {% endif %}
                     </div>
                 </div>
             </div>
-            <div class="col-md-3 col-sm-6 mb-3">
-                <div class="card text-center h-100">
+            
+            <!-- Reconocimientos -->
+            <div class="col-md-4 col-sm-6 mb-3">
+                <div class="card text-center h-100 border-warning">
                     <div class="card-body">
-                        <h2 class="text-warning">{{ resumen_rec|length }}</h2>
-                        <p class="card-text">Reconocimientos</p>
+                        <i class="bi bi-award-fill text-warning" style="font-size: 2.5rem;"></i>
+                        <h2 class="text-warning mt-2">{{ total_reconocimientos }}</h2>
+                        <p class="card-text fw-bold">Reconocimientos</p>
+                        <small class="text-muted">Logros académicos</small>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3 col-sm-6 mb-3">
-                <div class="card text-center h-100">
+            
+            <!-- Productos Laborales -->
+            <div class="col-md-4 col-sm-6 mb-3">
+                <div class="card text-center h-100 border-info">
                     <div class="card-body">
-                        <h2 class="text-info">{{ resumen_garage|length }}</h2>
-                        <p class="card-text">Productos en Garage</p>
+                        <i class="bi bi-rocket-takeoff-fill text-info" style="font-size: 2.5rem;"></i>
+                        <h2 class="text-info mt-2">{{ total_productos_laborales }}</h2>
+                        <p class="card-text fw-bold">Productos Laborales</p>
+                        <small class="text-muted">Proyectos profesionales</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Productos Académicos -->
+            <div class="col-md-4 col-sm-6 mb-3">
+                <div class="card text-center h-100 border-secondary">
+                    <div class="card-body">
+                        <i class="bi bi-journal-bookmark-fill text-secondary" style="font-size: 2.5rem;"></i>
+                        <h2 class="text-secondary mt-2">{{ total_productos_academicos }}</h2>
+                        <p class="card-text fw-bold">Productos Académicos</p>
+                        <small class="text-muted">Trabajos de investigación</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Garage -->
+            <div class="col-md-4 col-sm-6 mb-3">
+                <div class="card text-center h-100 border-dark">
+                    <div class="card-body">
+                        <i class="bi bi-bag-heart-fill text-dark" style="font-size: 2.5rem;"></i>
+                        <h2 class="text-dark mt-2">{{ total_garage }}</h2>
+                        <p class="card-text fw-bold">Productos en Garage</p>
+                        <small class="text-muted">Artículos en venta</small>
                     </div>
                 </div>
             </div>
@@ -107,24 +153,36 @@
     <!-- Quick Links -->
     <div class="text-center mt-5">
         <h3 class="mb-4">🌐 Acceso Rápido</h3>
-        <div class="row">
-            <div class="col-md-2 col-sm-4 mb-3">
-                <a href="/experiencia/" class="btn btn-outline-primary w-100">Experiencia</a>
+        <div class="row justify-content-center">
+            <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-3">
+                <a href="/experiencia/" class="btn btn-outline-primary w-100">
+                    <i class="bi bi-briefcase-fill me-1"></i> Experiencia
+                </a>
             </div>
-            <div class="col-md-2 col-sm-4 mb-3">
-                <a href="/cursos/" class="btn btn-outline-success w-100">Cursos</a>
+            <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-3">
+                <a href="/cursos/" class="btn btn-outline-success w-100">
+                    <i class="bi bi-mortarboard-fill me-1"></i> Cursos
+                </a>
             </div>
-            <div class="col-md-2 col-sm-4 mb-3">
-                <a href="/reconocimientos/" class="btn btn-outline-warning w-100">Reconocimientos</a>
+            <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-3">
+                <a href="/reconocimientos/" class="btn btn-outline-warning w-100">
+                    <i class="bi bi-award-fill me-1"></i> Reconocimientos
+                </a>
             </div>
-            <div class="col-md-2 col-sm-4 mb-3">
-                <a href="/productos-laborales/" class="btn btn-outline-info w-100">Prod. Laborales</a>
+            <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-3">
+                <a href="/productos-laborales/" class="btn btn-outline-info w-100">
+                    <i class="bi bi-rocket-takeoff-fill me-1"></i> Prod. Laborales
+                </a>
             </div>
-            <div class="col-md-2 col-sm-4 mb-3">
-                <a href="/productos-academicos/" class="btn btn-outline-secondary w-100">Prod. Académicos</a>
+            <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-3">
+                <a href="/productos-academicos/" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-journal-bookmark-fill me-1"></i> Prod. Académicos
+                </a>
             </div>
-            <div class="col-md-2 col-sm-4 mb-3">
-                <a href="/garage/" class="btn btn-outline-dark w-100">Garage</a>
+            <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-3">
+                <a href="/garage/" class="btn btn-outline-dark w-100">
+                    <i class="bi bi-bag-heart-fill me-1"></i> Garage
+                </a>
             </div>
         </div>
     </div>

@@ -6,7 +6,7 @@ import os
 import sys
 from pathlib import Path
 import dj_database_url
-from dotenv import load_dotenv  # <-- AÑADE ESTO
+from dotenv import load_dotenv
 
 # Cargar variables de entorno del archivo .env
 load_dotenv()
@@ -29,8 +29,9 @@ ALLOWED_HOSTS = []
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+    ALLOWED_HOSTS.append(f'www.{RENDER_EXTERNAL_HOSTNAME}')
 else:
-    ALLOWED_HOSTS.extend(['localhost', '127.0.0.1'])
+    ALLOWED_HOSTS.extend(['localhost', '127.0.0.1', '0.0.0.0'])
 
 # =========================
 # APPS (CON CLOUDINARY) - CORREGIDO
@@ -47,8 +48,8 @@ INSTALLED_APPS = [
     'cloudinary',
     'cloudinary_storage',
     
-    # Tu app - CORREGIDO
-    'tasks',  # SOLO 'tasks', NO 'tasks.apps.PerfilConfig'
+    # Tu app
+    'tasks',
 ]
 
 # =========================
@@ -81,6 +82,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',
             ],
         },
     },
@@ -128,6 +130,9 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ] if os.path.exists(BASE_DIR / 'static') else []
 
+# Configuración de WhiteNoise
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 # =========================
 # MEDIA FILES & CLOUDINARY - CORREGIDO
 # =========================
@@ -135,37 +140,29 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Configuración de Cloudinary
+CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME', 'dsz84kt2o')
+CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY', '51793893355762')
+CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET', '')
+
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', 'dsz84kt2o'),
-    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', '51793893355762'),
-    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', ''),
+    'CLOUD_NAME': CLOUDINARY_CLOUD_NAME,
+    'API_KEY': CLOUDINARY_API_KEY,
+    'API_SECRET': CLOUDINARY_API_SECRET,
 }
 
-# Configuración STORAGES para Django 4.2+ (sin DEFAULT_FILE_STORAGE)
-# Solo usar Cloudinary si tenemos las 3 claves
-if (CLOUDINARY_STORAGE['CLOUD_NAME'] and 
-    CLOUDINARY_STORAGE['API_KEY'] and 
-    CLOUDINARY_STORAGE['API_SECRET']):
-    STORAGES = {
-        "default": {
-            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-        },
-    }
+# Solo usar Cloudinary si tenemos las 3 claves configuradas
+CLOUDINARY_CONFIGURED = all([
+    CLOUDINARY_CLOUD_NAME,
+    CLOUDINARY_API_KEY,
+    CLOUDINARY_API_SECRET,
+])
+
+if CLOUDINARY_CONFIGURED:
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
     print("✅ Cloudinary activado para archivos media")
 else:
-    STORAGES = {
-        "default": {
-            "BACKEND": "django.core.files.storage.FileSystemStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-        },
-    }
-    print("Cloudinary NO configurado, usando sistema de archivos local")
-
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    print("⚠️ Cloudinary NO configurado, usando sistema de archivos local para media")
 
 # =========================
 # DEFAULT AUTO FIELD
@@ -182,7 +179,9 @@ if RENDER_EXTERNAL_HOSTNAME:
     CSRF_COOKIE_SECURE = True
     CSRF_TRUSTED_ORIGINS = [
         f'https://{RENDER_EXTERNAL_HOSTNAME}',
+        f'https://www.{RENDER_EXTERNAL_HOSTNAME}',
         'https://*.onrender.com',
+        'https://*.up.railway.app',
     ]
 else:
     SECURE_SSL_REDIRECT = False
@@ -195,9 +194,32 @@ else:
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # =========================
-# AUTO CREATE SUPERUSER - MOVIDO A UN LUGAR MÁS SEGURO
+# LOGGING (Opcional, para debug)
 # =========================
-# Nota: La creación automática de superusuario se ha removido de settings.py
-# para evitar errores durante el inicio. En su lugar, crea un management command
-# o usa un signal (e.g., en apps.py de tu app) para crearlo después de las migraciones.
-# Ejemplo de command: python manage.py createsuperuser --noinput (con variables de entorno)
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'propagate': False,
+        },
+    },
+}
+
+# =========================
+# IMPORTANTE PARA PDF Y ESTÁTICOS
+# =========================
+# Asegurar que whitenoise sirva archivos estáticos correctamente
+WHITENOISE_MANIFEST_STRICT = False
+WHITENOISE_ALLOW_ALL_ORIGINS = True
