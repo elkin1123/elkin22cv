@@ -1,4 +1,4 @@
-# tasks/views.py - VERSIÓN DEFINITIVA PARA RENDER
+# tasks/views.py - VERSIÓN CORREGIDA SIN ERRORES DE SYNTAX
 import datetime
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -260,7 +260,7 @@ def exportar_cv(request):
     try:
         perfil = get_perfil()
         if not perfil:
-            return HttpResponse("""
+            html_content = '''
             <html>
             <body style="font-family: Arial; padding: 20px;">
                 <h2>No hay perfil activo</h2>
@@ -268,7 +268,8 @@ def exportar_cv(request):
                 <p><a href="/">← Volver al inicio</a></p>
             </body>
             </html>
-            """)
+            '''
+            return HttpResponse(html_content)
         
         # Obtener datos (con try/except para cada uno)
         try:
@@ -299,9 +300,9 @@ def exportar_cv(request):
         # Fecha actual
         fecha = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
         
-        # HTML para imprimir
-        html = f"""
-        <!DOCTYPE html>
+        # Construir HTML seguro (sin f-strings problemáticas)
+        html_parts = []
+        html_parts.append(f'''<!DOCTYPE html>
         <html>
         <head>
             <meta charset="UTF-8">
@@ -333,54 +334,103 @@ def exportar_cv(request):
             <div class="container">
                 <div class="header">
                     <h1>{perfil.nombres} {perfil.apellidos}</h1>
-                    <h2>{perfil.nacionalidad if perfil.nacionalidad else 'Profesional'}</h2>
-                    <p>📞 {perfil.telefonoconvencional if perfil.telefonoconvencional else ''} | 📍 {perfil.direcciondomiciliaria if perfil.direcciondomiciliaria else ''}</p>
-                    {f'<p>🌐 {perfil.sitioweb}</p>' if perfil.sitioweb else ''}
-                </div>
-                
-                {f'<div class="section"><h3 class="section-title">Perfil Profesional</h3><p>{perfil.descripcionperfil}</p></div>' if perfil.descripcionperfil else ''}
-                
-                {f'<div class="section"><h3 class="section-title">Experiencia Laboral</h3>{"".join([f"<div class=\"item\"><h4>{exp.cargodesempenado}</h4><p><i>{getattr(exp, 'nombrempresa', '')} | {getattr(exp, 'fechainiciogestion', '')} - {getattr(exp, 'fechafingestion', '')}</i></p><p>{getattr(exp, 'descripcion', '')}</p></div>" for exp in experiencias])}</div>' if experiencias else ''}
-                
-                {f'<div class="section"><h3 class="section-title">Productos Académicos</h3>{"".join([f"<div class=\"item\"><h4>{prod.nombrerecurso}</h4><p>{getattr(prod, 'clasificador', '')}</p><p>{getattr(prod, 'descripcion', '')}</p></div>" for prod in academicos])}</div>' if academicos else ''}
-                
-                {f'<div class="section"><h3 class="section-title">Productos Laborales</h3>{"".join([f"<div class=\"item\"><h4>{prod.nombreproducto}</h4><p>{getattr(prod, 'fechaproducto', '')}</p><p>{getattr(prod, 'descripcion', '')}</p></div>" for prod in laborales])}</div>' if laborales else ''}
-                
-                {f'<div class="section"><h3 class="section-title">Cursos Realizados</h3>{"".join([f"<div class=\"item\"><h4>{curso.nombrecurso}</h4><p><i>{getattr(curso, 'entidadpatrocinadora', '')} | {getattr(curso, 'fechafin', '')} | {getattr(curso, 'totalhoras', '')} horas</i></p></div>" for curso in cursos_list])}</div>' if cursos_list else ''}
-                
-                {f'<div class="section"><h3 class="section-title">Reconocimientos</h3>{"".join([f"<div class=\"item\"><h4>{rec.descripcionreconocimiento}</h4><p><i>{getattr(rec, 'tiporeconocimiento', '')} | {getattr(rec, 'fechareconocimiento', '')}</i></p><p>{getattr(rec, 'descripcion', '')}</p></div>" for rec in reconocimientos_list])}</div>' if reconocimientos_list else ''}
-                
-                <div class="section">
-                    <h3 class="section-title">Información Personal</h3>
-                    <div class="item">
-                        <p><strong>Nacionalidad:</strong> {perfil.nacionalidad or 'No especificada'}</p>
-                        {f'<p><strong>Cédula:</strong> {perfil.numerocedula}</p>' if perfil.numerocedula else ''}
-                        {f'<p><strong>Estado civil:</strong> {perfil.estadocivil}</p>' if perfil.estadocivil else ''}
-                    </div>
-                </div>
-                
-                <div style="text-align: center; margin-top: 50px; padding-top: 20px; border-top: 1px solid #ddd; color: #7f8c8d; font-size: 11px;">
-                    <p>Documento generado el {fecha}</p>
-                    <p>CV profesional de {perfil.nombres} {perfil.apellidos}</p>
-                </div>
+                    <h2>{perfil.nacionalidad if perfil.nacionalidad else "Profesional"}</h2>
+                    <p>📞 {perfil.telefonoconvencional if perfil.telefonoconvencional else ""} | 📍 {perfil.direcciondomiciliaria if perfil.direcciondomiciliaria else ""}</p>''')
+        
+        if perfil.sitioweb:
+            html_parts.append(f'<p>🌐 {perfil.sitioweb}</p>')
+        
+        html_parts.append('</div>')
+        
+        # Perfil profesional
+        if perfil.descripcionperfil:
+            html_parts.append(f'<div class="section"><h3 class="section-title">Perfil Profesional</h3><p>{perfil.descripcionperfil}</p></div>')
+        
+        # Experiencia Laboral
+        if experiencias:
+            exp_html = '<div class="section"><h3 class="section-title">Experiencia Laboral</h3>'
+            for exp in experiencias:
+                exp_html += f'''<div class="item"><h4>{exp.cargodesempenado}</h4>
+                    <p><i>{getattr(exp, "nombrempresa", "")} | {getattr(exp, "fechainiciogestion", "")} - {getattr(exp, "fechafingestion", "")}</i></p>
+                    <p>{getattr(exp, "descripcion", "")}</p></div>'''
+            exp_html += '</div>'
+            html_parts.append(exp_html)
+        
+        # Productos Académicos
+        if academicos:
+            acad_html = '<div class="section"><h3 class="section-title">Productos Académicos</h3>'
+            for prod in academicos:
+                acad_html += f'''<div class="item"><h4>{prod.nombrerecurso}</h4>
+                    <p>{getattr(prod, "clasificador", "")}</p>
+                    <p>{getattr(prod, "descripcion", "")}</p></div>'''
+            acad_html += '</div>'
+            html_parts.append(acad_html)
+        
+        # Productos Laborales
+        if laborales:
+            lab_html = '<div class="section"><h3 class="section-title">Productos Laborales</h3>'
+            for prod in laborales:
+                lab_html += f'''<div class="item"><h4>{prod.nombreproducto}</h4>
+                    <p>{getattr(prod, "fechaproducto", "")}</p>
+                    <p>{getattr(prod, "descripcion", "")}</p></div>'''
+            lab_html += '</div>'
+            html_parts.append(lab_html)
+        
+        # Cursos
+        if cursos_list:
+            cursos_html = '<div class="section"><h3 class="section-title">Cursos Realizados</h3>'
+            for curso in cursos_list:
+                cursos_html += f'''<div class="item"><h4>{curso.nombrecurso}</h4>
+                    <p><i>{getattr(curso, "entidadpatrocinadora", "")} | {getattr(curso, "fechafin", "")} | {getattr(curso, "totalhoras", "")} horas</i></p></div>'''
+            cursos_html += '</div>'
+            html_parts.append(cursos_html)
+        
+        # Reconocimientos
+        if reconocimientos_list:
+            rec_html = '<div class="section"><h3 class="section-title">Reconocimientos</h3>'
+            for rec in reconocimientos_list:
+                rec_html += f'''<div class="item"><h4>{rec.descripcionreconocimiento}</h4>
+                    <p><i>{getattr(rec, "tiporeconocimiento", "")} | {getattr(rec, "fechareconocimiento", "")}</i></p>
+                    <p>{getattr(rec, "descripcion", "")}</p></div>'''
+            rec_html += '</div>'
+            html_parts.append(rec_html)
+        
+        # Información personal
+        html_parts.append(f'''<div class="section">
+            <h3 class="section-title">Información Personal</h3>
+            <div class="item">
+                <p><strong>Nacionalidad:</strong> {perfil.nacionalidad or "No especificada"}</p>''')
+        
+        if perfil.numerocedula:
+            html_parts.append(f'<p><strong>Cédula:</strong> {perfil.numerocedula}</p>')
+        
+        if perfil.estadocivil:
+            html_parts.append(f'<p><strong>Estado civil:</strong> {perfil.estadocivil}</p>')
+        
+        html_parts.append(f'''</div>
             </div>
             
-            <script>
-                setTimeout(() => {{
-                    if (!sessionStorage.getItem('alreadyPrinted')) {{
-                        window.print();
-                        sessionStorage.setItem('alreadyPrinted', 'true');
-                    }}
-                }}, 2000);
-            </script>
-        </body>
-        </html>
-        """
+            <div style="text-align: center; margin-top: 50px; padding-top: 20px; border-top: 1px solid #ddd; color: #7f8c8d; font-size: 11px;">
+                <p>Documento generado el {fecha}</p>
+                <p>CV profesional de {perfil.nombres} {perfil.apellidos}</p>
+            </div>
+        </div>
         
-        return HttpResponse(html)
+        <script>
+            setTimeout(function() {{
+                if (!sessionStorage.getItem("alreadyPrinted")) {{
+                    window.print();
+                    sessionStorage.setItem("alreadyPrinted", "true");
+                }}
+            }}, 2000);
+        </script>
+        </body>
+        </html>''')
+        
+        return HttpResponse(''.join(html_parts))
         
     except Exception as e:
-        return HttpResponse(f"""
+        error_html = f'''
         <html>
         <body style="font-family: Arial; padding: 20px;">
             <h2>Error generando CV</h2>
@@ -388,7 +438,8 @@ def exportar_cv(request):
             <p><a href="/">← Volver al inicio</a></p>
         </body>
         </html>
-        """)
+        '''
+        return HttpResponse(error_html)
 
 def pdf_datos_personales(request):
     """Alias para mantener compatibilidad."""
